@@ -1,19 +1,39 @@
-xv6 is a re-implementation of Dennis Ritchie's and Ken Thompson's Unix
+# XV6
+
+This is my respository for changes made to the XV6 kernel.  
+
+## Successful Changes
+
+- Trace Syscall
+
+## Proposed Changes
+
+- New Scheduler (lottery based)
+- New SysCall for virtual->physical address translation
+- Multithreaded program execution
+- Additional File System Support
+
+------
+
+
+### ORIGINAL README - MIT Repository
+
+*xv6 is a re-implementation of Dennis Ritchie's and Ken Thompson's Unix
 Version 6 (v6).  xv6 loosely follows the structure and style of v6,
-but is implemented for a modern RISC-V multiprocessor using ANSI C.
+but is implemented for a modern RISC-V multiprocessor using ANSI C.*
 
-ACKNOWLEDGMENTS
+*ACKNOWLEDGMENTS*
 
-xv6 is inspired by John Lions's Commentary on UNIX 6th Edition (Peer
+*xv6 is inspired by John Lions's Commentary on UNIX 6th Edition (Peer
 to Peer Communications; ISBN: 1-57398-013-7; 1st edition (June 14,
 2000)). See also https://pdos.csail.mit.edu/6.828/, which
-provides pointers to on-line resources for v6.
+provides pointers to on-line resources for v6.*
 
-The following people have made contributions: Russ Cox (context switching,
+*The following people have made contributions: Russ Cox (context switching,
 locking), Cliff Frey (MP), Xiao Yu (MP), Nickolai Zeldovich, and Austin
-Clements.
+Clements.*
 
-We are also grateful for the bug reports and patches contributed by
+*We are also grateful for the bug reports and patches contributed by
 Silas Boyd-Wickizer, Anton Burtsev, Dan Cross, Cody Cutler, Mike CAT,
 Tej Chajed, Asami Doi, eyalz800, , Nelson Elhage, Saar Ettinger, Alice
 Ferrazzi, Nathaniel Filardo, Peter Froehlich, Yakir Goaron,Shivam
@@ -25,21 +45,21 @@ Greg Price, Ayan Shafqat, Eldar Sehayek, Yongming Shen, Fumiya
 Shigemitsu, Takahiro, Cam Tenny, tyfkda, Rafael Ubal, Warren Toomey,
 Stephen Tu, Pablo Ventura, Xi Wang, Keiichi Watanabe, Nicolas
 Wolovick, wxdao, Grant Wu, Jindong Zhang, Icenowy Zheng, and Zou Chang
-Wei.
+Wei.*
 
-The code in the files that constitute xv6 is
-Copyright 2006-2020 Frans Kaashoek, Robert Morris, and Russ Cox.
+*The code in the files that constitute xv6 is
+Copyright 2006-2020 Frans Kaashoek, Robert Morris, and Russ Cox.*
 
-ERROR REPORTS
+*ERROR REPORTS*
 
-Please send errors and suggestions to Frans Kaashoek and Robert Morris
+*Please send errors and suggestions to Frans Kaashoek and Robert Morris
 (kaashoek,rtm@mit.edu). The main purpose of xv6 is as a teaching
 operating system for MIT's 6.S081, so we are more interested in
-simplifications and clarifications than new features.
+simplifications and clarifications than new features.*
 
-BUILDING AND RUNNING XV6
+*BUILDING AND RUNNING XV6*
 
-You will need a RISC-V "newlib" tool chain from
+*You will need a RISC-V "newlib" tool chain from
 https://github.com/riscv/riscv-gnu-toolchain, and qemu compiled for
 riscv64-softmmu. Once they are installed, and in your shell
-search path, you can run "make qemu".
+search path, you can run "make qemu".*
