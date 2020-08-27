@@ -95,3 +95,19 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+// sets the trace bit on TCB to true
+uint64 
+sys_settrace(void)
+{
+  myproc()->trace = 1;
+  return 0;
+}
+
+
+uint64
+sys_untrace(void) 
+{
+  myproc()->trace = 0;
+  return 0;
+}

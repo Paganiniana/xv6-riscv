@@ -38,6 +38,8 @@ procinit(void)
       uint64 va = KSTACK((int) (p - proc));
       kvmmap(va, (uint64)pa, PGSIZE, PTE_R | PTE_W);
       p->kstack = va;
+      // initialize trace value to 0
+      p->trace = 0;
   }
   kvminithart();
 }
@@ -279,6 +281,9 @@ fork(void)
   pid = np->pid;
 
   np->state = RUNNABLE;
+
+  // if the parent was running under a trace, extend that to the child
+  np->trace = p->trace;
 
   release(&np->lock);
 
