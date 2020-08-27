@@ -473,6 +473,28 @@ scheduler(void)
   }
 }
 
+
+/** INTERFACE
+ * 
+ * lottery_scheduler is referenced by all of the same systems as scheduler (above)
+ * it is periodically 'swtch'ed to, by the sched function, which is called on timer interrupts.
+ * lottery_scheduler never stops running.  When swtch returns to it, it is at the call to swtch, thus, 
+ * in the middle of an endless loop.  The only difference between this function and the default scheduler is
+ * that lottery_scheduler picks a currently running program at random. It has a helper function, getrandomrunnable()
+*/ 
+void
+lottery_scheduler(void)
+{
+  // TODO
+  //  - make a 'get current time' procedure
+  //  - then, make a 'generate random number with seed' procedure
+  //  - then, make a select a random, runnable, process procedure
+}
+
+
+
+
+
 // Switch to scheduler.  Must hold only p->lock
 // and have changed proc->state. Saves and restores
 // intena because intena is a property of this
