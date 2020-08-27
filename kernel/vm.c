@@ -16,9 +16,7 @@ extern char etext[];  // kernel.ld sets this to end of kernel code.
 extern char trampoline[]; // trampoline.S
 
 /*
- * create a direct-map page table for the kernel and
- * turn on paging. called early, in supervisor mode.
- * the page allocator is already initialized.
+ * create a direct-map page table for the kernel.
  */
 void
 kvminit()
@@ -67,10 +65,10 @@ kvminithart()
 // A 64-bit virtual address is split into five fields:
 //   39..63 -- must be zero.
 //   30..38 -- 9 bits of level-2 index.
-//   21..39 -- 9 bits of level-1 index.
+//   21..29 -- 9 bits of level-1 index.
 //   12..20 -- 9 bits of level-0 index.
-//    0..12 -- 12 bits of byte offset within the page.
-static pte_t *
+//    0..11 -- 12 bits of byte offset within the page.
+pte_t *
 walk(pagetable_t pagetable, uint64 va, int alloc)
 {
   if(va >= MAXVA)
@@ -169,47 +167,42 @@ mappages(pagetable_t pagetable, uint64 va, uint64 size, uint64 pa, int perm)
   return 0;
 }
 
-// Remove mappings from a page table. The mappings in
-// the given range must exist. Optionally free the
-// physical memory.
+// Remove npages of mappings starting from va. va must be
+// page-aligned. The mappings must exist.
+// Optionally free the physical memory.
 void
-uvmunmap(pagetable_t pagetable, uint64 va, uint64 size, int do_free)
+uvmunmap(pagetable_t pagetable, uint64 va, uint64 npages, int do_free)
 {
-  uint64 a, last;
+  uint64 a;
   pte_t *pte;
-  uint64 pa;
 
-  a = PGROUNDDOWN(va);
-  last = PGROUNDDOWN(va + size - 1);
-  for(;;){
+  if((va % PGSIZE) != 0)
+    panic("uvmunmap: not aligned");
+
+  for(a = va; a < va + npages*PGSIZE; a += PGSIZE){
     if((pte = walk(pagetable, a, 0)) == 0)
       panic("uvmunmap: walk");
-    if((*pte & PTE_V) == 0){
-      printf("va=%p pte=%p\n", a, *pte);
+    if((*pte & PTE_V) == 0)
       panic("uvmunmap: not mapped");
-    }
     if(PTE_FLAGS(*pte) == PTE_V)
       panic("uvmunmap: not a leaf");
     if(do_free){
-      pa = PTE2PA(*pte);
+      uint64 pa = PTE2PA(*pte);
       kfree((void*)pa);
     }
     *pte = 0;
-    if(a == last)
-      break;
-    a += PGSIZE;
-    pa += PGSIZE;
   }
 }
 
 // create an empty user page table.
+// returns 0 if out of memory.
 pagetable_t
 uvmcreate()
 {
   pagetable_t pagetable;
   pagetable = (pagetable_t) kalloc();
   if(pagetable == 0)
-    panic("uvmcreate: out of memory");
+    return 0;
   memset(pagetable, 0, PGSIZE);
   return pagetable;
 }
@@ -242,8 +235,7 @@ uvmalloc(pagetable_t pagetable, uint64 oldsz, uint64 newsz)
     return oldsz;
 
   oldsz = PGROUNDUP(oldsz);
-  a = oldsz;
-  for(; a < newsz; a += PGSIZE){
+  for(a = oldsz; a < newsz; a += PGSIZE){
     mem = kalloc();
     if(mem == 0){
       uvmdealloc(pagetable, a, oldsz);
@@ -269,16 +261,17 @@ uvmdealloc(pagetable_t pagetable, uint64 oldsz, uint64 newsz)
   if(newsz >= oldsz)
     return oldsz;
 
-  uint64 newup = PGROUNDUP(newsz);
-  if(newup < PGROUNDUP(oldsz))
-    uvmunmap(pagetable, newup, oldsz - newup, 1);
+  if(PGROUNDUP(newsz) < PGROUNDUP(oldsz)){
+    int npages = (PGROUNDUP(oldsz) - PGROUNDUP(newsz)) / PGSIZE;
+    uvmunmap(pagetable, PGROUNDUP(newsz), npages, 1);
+  }
 
   return newsz;
 }
 
 // Recursively free page-table pages.
 // All leaf mappings must already have been removed.
-static void
+void
 freewalk(pagetable_t pagetable)
 {
   // there are 2^9 = 512 PTEs in a page table.
@@ -301,7 +294,8 @@ freewalk(pagetable_t pagetable)
 void
 uvmfree(pagetable_t pagetable, uint64 sz)
 {
-  uvmunmap(pagetable, 0, sz, 1);
+  if(sz > 0)
+    uvmunmap(pagetable, 0, PGROUNDUP(sz)/PGSIZE, 1);
   freewalk(pagetable);
 }
 
@@ -337,7 +331,7 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
   return 0;
 
  err:
-  uvmunmap(new, 0, i, 1);
+  uvmunmap(new, 0, i / PGSIZE, 1);
   return -1;
 }
 
