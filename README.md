@@ -5,6 +5,7 @@ This is my respository for changes made to the XV6 kernel.
 ## Successful Changes
 
 - Trace Syscall
+- PRG (Linear Congruential PRG)
 
 ## Proposed Changes
 
