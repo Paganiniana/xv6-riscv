@@ -25,6 +25,7 @@ int sleep(int);
 int uptime(void);
 int settrace(void);
 int untrace(void);
+int getrandom(int);
 
 // ulib.c
 int stat(const char*, struct stat*);

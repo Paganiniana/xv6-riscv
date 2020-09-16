@@ -94,6 +94,8 @@ struct cpu*     getmycpu(void);
 struct proc*    myproc();
 void            procinit(void);
 void            scheduler(void) __attribute__((noreturn));
+void            lottery_scheduler(void) __attribute__((noreturn));
+uint            getrandom(int);
 void            sched(void);
 void            setproc(struct proc*);
 void            sleep(void*, struct spinlock*);

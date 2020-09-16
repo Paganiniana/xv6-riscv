@@ -106,6 +106,7 @@ extern uint64 sys_write(void);
 extern uint64 sys_uptime(void);
 extern uint64 sys_settrace(void);
 extern uint64 sys_untrace(void);
+extern uint64 sys_getrandom(void);
 
 static uint64 (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -131,6 +132,7 @@ static uint64 (*syscalls[])(void) = {
 [SYS_close]   sys_close,
 [SYS_settrace]   sys_settrace,
 [SYS_untrace]    sys_untrace,
+[SYS_getrandom]  sys_getrandom,
 };
 
 // local use, for the sake of trace
@@ -139,7 +141,7 @@ char * syscall_names[] = {
   "fork", "exit", "wait", "pipe", "read",
   "kill", "exec", "fstat", "chdir", "dup", "getpid",
   "sbrk", "sleep", "uptime", "open", "write", "mknod", "unlink",
-  "link", "mkdir", "close", "settrace", "untrace",
+  "link", "mkdir", "close", "settrace", "untrace", "getrandom",
 };
 
 void

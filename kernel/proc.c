@@ -75,6 +75,7 @@ myproc(void) {
   return p;
 }
 
+
 int
 allocpid() {
   int pid;
@@ -500,14 +501,96 @@ scheduler(void)
 void
 lottery_scheduler(void)
 {
-  // TODO
-  //  - make a 'get current time' procedure
-  //  - then, make a 'generate random number with seed' procedure
-  //  - then, make a select a random, runnable, process procedure
+  struct proc *p;
+  struct cpu *c = mycpu();
+  
+  c->proc = 0;
+  for(;;){
+    // Avoid deadlock by ensuring that devices can interrupt.
+    intr_on();
+
+    uint rand = getrandom(NPROC);
+
+    p = &proc[rand];
+
+    // same as the original scheduler
+    acquire(&p->lock);
+    if(p->state == RUNNABLE) {
+        p->state = RUNNING;
+        c->proc = p;
+        swtch(&c->context, &p->context);
+        c->proc = 0;
+      }
+      release(&p->lock);
+  }
 }
 
+/** ITERFACE
+ * 
+ * Expects a limit (integer)
+ * Returns a random unsigned integer between 0 and the limit. 
+ */
+
+// global, last random
+uint LAST_RANDOM = 1;
+
+uint 
+getrandom(int lim) {
+  // getrandom uses a linear congruential generator, defined as follows
+  //  X(sub n+1) = (aX[sub n] + c) mod m
+  // using values for a, c, and m as used in ANSI C's implementation
+
+  // m = m^31
+  uint m = 1;
+  for (int i = 0; i < 30; i++) {
+    m = m << 1;
+    m += 1;
+  }
+
+  // seemingly arbitrary multiplier
+  uint a = 1103515245;
+
+  // c
+  uint c = 12345;
+
+  // washes
+  // number of times seed gets processed
+  uint times = 5;
+
+  // seed
+  // the will be taken from sys_uptime
+  // multiplied by "last seed"
+  // to ensure that getrandom() doesn't return
+  // the same values in quick succession
+  // causing stalls when it is used repeatedly
+  // (like, in a scheduler)
 
 
+  // used definition of sysproc.c
+  uint xticks;
+
+  acquire(&tickslock);
+  xticks = ticks;
+  release(&tickslock);
+
+  uint seed = (xticks * LAST_RANDOM + 1);
+
+  while(times > 0) {
+    seed = ((a * seed) + c) % m;
+    times = times -1;
+  }
+
+  // put the result in terms of the limit given by the user
+  
+  uint res = seed % lim;
+
+  // store it for use on the next function call
+  LAST_RANDOM = res;
+
+  // return it to the user
+  return res;
+
+}
 
 
 // Switch to scheduler.  Must hold only p->lock

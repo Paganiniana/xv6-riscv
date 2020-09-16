@@ -111,3 +111,16 @@ sys_untrace(void)
   myproc()->trace = 0;
   return 0;
 }
+
+// returns a random number between 0 and lim
+
+uint
+sys_getrandom()
+{
+// export getrandom
+
+  int lim;
+  argint(0, &lim);
+
+  return getrandom(lim);
+}
