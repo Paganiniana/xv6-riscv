@@ -2,13 +2,13 @@
 
 This is my respository for changes made to the XV6 kernel.  
 
-## Successfully Added Features
+## Successful Features
 
 - Trace Syscall
 - PRG (Linear Congruential PRG)
 - Lottery Scheduler
 
-## Proposed Changes
+## Proposed Features
 
 - New SysCall for virtual->physical address translation
 - Multithreaded program execution
