@@ -509,9 +509,13 @@ lottery_scheduler(void)
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
 
-    uint rand = getrandom(NPROC);
 
-    p = &proc[rand];
+    // // SIMPLE get random index of runnable process
+    // uint index = getrandom(NPROC);
+
+    uint index = getrandom(NPROC); 
+
+    p = &proc[index];
 
     // same as the original scheduler
     acquire(&p->lock);
@@ -525,7 +529,8 @@ lottery_scheduler(void)
   }
 }
 
-/** ITERFACE
+
+/** INTERFACE
  * 
  * Expects a limit (integer)
  * Returns a random unsigned integer between 0 and the limit. 

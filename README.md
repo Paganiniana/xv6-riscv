@@ -2,17 +2,23 @@
 
 This is my respository for changes made to the XV6 kernel.  
 
-## Successful Changes
+## Successfully Added Features
 
 - Trace Syscall
 - PRG (Linear Congruential PRG)
+- Lottery Scheduler
 
 ## Proposed Changes
 
-- New Scheduler (lottery based)
 - New SysCall for virtual->physical address translation
 - Multithreaded program execution
 - Additional File System Support
+
+## Notes on features
+
+### Lottery Scheduler
+
+Right now, the lottery scheduler is pretty inefficient.  It repeatedly gets a random number, n, where 0 <= n < NPROC.  If the process indexed at that value is ready to run, it runs.  If not, a new number is generated.   In xv6, NPROC is the constant which determines how many running processes there can be, at any given point, on the system.  As it is, this scheduler is slower than the simple Round Robin scheduler tha is built in.  However, if NPROC were to be increased, the amount of time required to find and run a runnable proceess would increase, exponentially.  Therefore, it would be more efficient create a new list that keeps the indexes of runnable processes.  Some overhead would be introduced in maintaining (shrinking/growing) this list as it is used.  More experimentation is needed.
 
 ------
 
